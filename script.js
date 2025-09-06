@@ -55,6 +55,7 @@ class VoiceEyesPro {
     setupEventListeners() {
         // Camera controls
         document.getElementById('startCamera').addEventListener('click', () => this.startCamera());
+        document.getElementById('stopCamera').addEventListener('click', () => this.stopCamera());
         document.getElementById('switchCamera').addEventListener('click', () => this.showCameraSelector());
         document.getElementById('captureBtn').addEventListener('click', () => this.captureAndDescribe());
         
@@ -688,6 +689,11 @@ class VoiceEyesPro {
         document.getElementById('spatialNav').setAttribute('aria-pressed', this.spatialNavEnabled);
         document.getElementById('spatialNav').classList.toggle('active', this.spatialNavEnabled);
         document.getElementById('spatialPanel').style.display = this.spatialNavEnabled ? 'block' : 'none';
+        
+        if (this.spatialNavEnabled) {
+            this.generateNavigationPoints();
+        }
+        
         this.hapticFeedback('short');
         this.updateStatus(this.spatialNavEnabled ? '🧭 Spatial navigation enabled - 9-point grid active' : 'Spatial navigation disabled');
         this.updateModeIndicator();
@@ -786,6 +792,441 @@ class VoiceEyesPro {
             document.documentElement.setAttribute('data-theme', 'dark');
             document.getElementById('darkModeToggle').setAttribute('aria-pressed', 'true');
             document.getElementById('darkModeToggle').classList.add('active');
+        }
+    }
+
+    // Core Camera Methods
+    async startCamera() {
+        try {
+            this.updateStatus('📹 Starting camera...');
+            this.hapticFeedback('short');
+            
+            const constraints = {
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: 'environment'
+                }
+            };
+            
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            this.video.srcObject = this.stream;
+            
+            this.video.onloadedmetadata = () => {
+                this.video.play();
+                this.updateStatus('📹 Camera ready! Click "Analyze Scene" to begin');
+                this.enableCameraControls();
+                this.hapticFeedback('success');
+                this.playAudioBeacon('success');
+            };
+            
+            this.video.onerror = (error) => {
+                console.error('Video error:', error);
+                this.updateStatus('❌ Camera error. Please check permissions and try again.');
+                this.hapticFeedback('error');
+                this.playAudioBeacon('error');
+            };
+            
+            // Get available devices
+            await this.getCameraDevices();
+            
+        } catch (error) {
+            console.error('Camera access error:', error);
+            this.handleCameraError(error);
+        }
+    }
+    
+    async getCameraDevices() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            this.currentDevices = devices.filter(device => device.kind === 'videoinput');
+            
+            if (this.currentDevices.length > 1) {
+                document.getElementById('switchCamera').disabled = false;
+            }
+        } catch (error) {
+            console.error('Error getting camera devices:', error);
+        }
+    }
+    
+    handleCameraError(error) {
+        let message = '❌ Camera access failed. ';
+        
+        if (error.name === 'NotAllowedError') {
+            message += 'Please allow camera permissions and refresh the page.';
+            document.getElementById('permissionHelp').style.display = 'flex';
+        } else if (error.name === 'NotFoundError') {
+            message += 'No camera found on this device.';
+        } else if (error.name === 'NotSupportedError') {
+            message += 'Camera not supported in this browser.';
+        } else {
+            message += 'Please check your camera and try again.';
+        }
+        
+        this.updateStatus(message);
+        this.hapticFeedback('error');
+        this.playAudioBeacon('error');
+    }
+    
+    enableCameraControls() {
+        document.getElementById('captureBtn').disabled = false;
+        document.getElementById('voiceBtn').disabled = false;
+        document.getElementById('repeatBtn').disabled = false;
+        document.getElementById('stopCamera').disabled = false;
+        
+        if (this.currentDevices.length > 1) {
+            document.getElementById('switchCamera').disabled = false;
+        }
+    }
+    
+    stopCamera() {
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+            this.stream = null;
+        }
+        
+        this.video.srcObject = null;
+        this.video.pause();
+        
+        // Disable camera controls
+        document.getElementById('captureBtn').disabled = true;
+        document.getElementById('voiceBtn').disabled = true;
+        document.getElementById('repeatBtn').disabled = true;
+        document.getElementById('stopCamera').disabled = true;
+        document.getElementById('switchCamera').disabled = true;
+        
+        // Clear overlays
+        document.getElementById('cameraOverlay').innerHTML = '';
+        document.getElementById('description').textContent = 'Descriptions will appear here...';
+        
+        this.updateStatus('📹 Camera stopped. Click "Start Camera" to begin again.');
+        this.hapticFeedback('short');
+        this.playAudioBeacon('info');
+    }
+    
+    showCameraSelector() {
+        const modal = document.getElementById('cameraSelector');
+        const cameraList = document.getElementById('cameraList');
+        
+        cameraList.innerHTML = '';
+        
+        this.currentDevices.forEach((device, index) => {
+            const button = document.createElement('button');
+            button.className = 'camera-option';
+            button.textContent = device.label || `Camera ${index + 1}`;
+            button.onclick = () => this.switchCamera(index);
+            cameraList.appendChild(button);
+        });
+        
+        modal.style.display = 'flex';
+    }
+    
+    async switchCamera(deviceIndex) {
+        try {
+            if (this.stream) {
+                this.stream.getTracks().forEach(track => track.stop());
+            }
+            
+            const constraints = {
+                video: {
+                    deviceId: { exact: this.currentDevices[deviceIndex].deviceId }
+                }
+            };
+            
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            this.video.srcObject = this.stream;
+            this.currentDeviceIndex = deviceIndex;
+            
+            document.getElementById('cameraSelector').style.display = 'none';
+            this.updateStatus(`📹 Switched to ${this.currentDevices[deviceIndex].label || 'Camera'}`);
+            this.hapticFeedback('short');
+            
+        } catch (error) {
+            console.error('Camera switch error:', error);
+            this.updateStatus('❌ Failed to switch camera');
+            this.hapticFeedback('error');
+        }
+    }
+    
+    // Core Analysis Methods
+    async captureAndDescribe() {
+        if (!this.video.videoWidth || !this.video.videoHeight) {
+            this.updateStatus('❌ Camera not ready. Please start camera first.');
+            this.hapticFeedback('error');
+            return;
+        }
+        
+        try {
+            this.updateStatus('🧠 Analyzing scene...');
+            this.hapticFeedback('short');
+            
+            // Capture frame
+            this.canvas.width = this.video.videoWidth;
+            this.canvas.height = this.video.videoHeight;
+            this.ctx.drawImage(this.video, 0, 0);
+            
+            const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
+            const base64Data = imageData.split(',')[1];
+            
+            // Call Google Vision API
+            const visionData = await this.callGoogleVisionAPI(base64Data, ['LABEL_DETECTION', 'OBJECT_LOCALIZATION', 'TEXT_DETECTION']);
+            
+            if (visionData && visionData.responses && visionData.responses[0]) {
+                this.processVisionResults(visionData);
+            } else {
+                this.updateStatus('❌ Analysis failed. Please try again.');
+                this.hapticFeedback('error');
+            }
+            
+        } catch (error) {
+            console.error('Analysis error:', error);
+            this.updateStatus('❌ Analysis failed. Please check your connection and try again.');
+            this.hapticFeedback('error');
+            this.playAudioBeacon('error');
+        }
+    }
+    
+    async captureAndDescribeColors() {
+        if (!this.video.videoWidth || !this.video.videoHeight) {
+            this.updateStatus('❌ Camera not ready. Please start camera first.');
+            this.hapticFeedback('error');
+            return;
+        }
+        
+        try {
+            this.updateStatus('🎨 Analyzing colors...');
+            this.hapticFeedback('short');
+            
+            this.canvas.width = this.video.videoWidth;
+            this.canvas.height = this.video.videoHeight;
+            this.ctx.drawImage(this.video, 0, 0);
+            
+            const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
+            const base64Data = imageData.split(',')[1];
+            
+            const visionData = await this.callGoogleVisionAPI(base64Data, ['IMAGE_PROPERTIES']);
+            
+            if (visionData && visionData.responses && visionData.responses[0]) {
+                this.processColorAnalysis(visionData);
+            } else {
+                this.updateStatus('❌ Color analysis failed. Please try again.');
+                this.hapticFeedback('error');
+            }
+            
+        } catch (error) {
+            console.error('Color analysis error:', error);
+            this.updateStatus('❌ Color analysis failed. Please try again.');
+            this.hapticFeedback('error');
+        }
+    }
+    
+    async captureAndReadText() {
+        if (!this.video.videoWidth || !this.video.videoHeight) {
+            this.updateStatus('❌ Camera not ready. Please start camera first.');
+            this.hapticFeedback('error');
+            return;
+        }
+        
+        try {
+            this.updateStatus('📖 Reading text...');
+            this.hapticFeedback('short');
+            
+            this.canvas.width = this.video.videoWidth;
+            this.canvas.height = this.video.videoHeight;
+            this.ctx.drawImage(this.video, 0, 0);
+            
+            const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
+            const base64Data = imageData.split(',')[1];
+            
+            const visionData = await this.callGoogleVisionAPI(base64Data, ['TEXT_DETECTION', 'DOCUMENT_TEXT_DETECTION']);
+            
+            if (visionData && visionData.responses && visionData.responses[0]) {
+                this.processTextAnalysis(visionData);
+            } else {
+                this.updateStatus('❌ Text reading failed. Please try again.');
+                this.hapticFeedback('error');
+            }
+            
+        } catch (error) {
+            console.error('Text reading error:', error);
+            this.updateStatus('❌ Text reading failed. Please try again.');
+            this.hapticFeedback('error');
+        }
+    }
+    
+    async callGoogleVisionAPI(imageData, features) {
+        const request = {
+            requests: [{
+                image: {
+                    content: imageData
+                },
+                features: features.map(feature => ({ type: feature, maxResults: 10 }))
+            }]
+        };
+        
+        const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_VISION_API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Vision API error: ${response.status}`);
+        }
+        
+        return await response.json();
+    }
+    
+    processVisionResults(visionData) {
+        const response = visionData.responses[0];
+        let description = '';
+        
+        // Process labels
+        if (response.labelAnnotations) {
+            const labels = response.labelAnnotations.slice(0, 5).map(label => label.description);
+            description += `I can see: ${labels.join(', ')}. `;
+        }
+        
+        // Process objects
+        if (response.localizedObjectAnnotations) {
+            const objects = response.localizedObjectAnnotations.slice(0, 3).map(obj => obj.name);
+            if (objects.length > 0) {
+                description += `Objects detected: ${objects.join(', ')}. `;
+            }
+        }
+        
+        // Process text
+        if (response.textAnnotations && response.textAnnotations.length > 0) {
+            const text = response.textAnnotations[0].description;
+            if (text.length > 0) {
+                description += `Text found: ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}. `;
+            }
+        }
+        
+        if (description === '') {
+            description = 'I can see the scene but no specific objects or text were detected.';
+        }
+        
+        this.updateDescription(description);
+        this.speakText(description);
+        this.updateCameraStats(visionData);
+        this.drawObjectBoxes(visionData);
+        this.hapticFeedback('success');
+        this.playAudioBeacon('success');
+        this.updateStatus('✅ Analysis complete');
+    }
+    
+    processColorAnalysis(visionData) {
+        const response = visionData.responses[0];
+        let colorDescription = '';
+        
+        if (response.imagePropertiesAnnotation && response.imagePropertiesAnnotation.dominantColors) {
+            const colors = response.imagePropertiesAnnotation.dominantColors.colors.slice(0, 5);
+            const colorNames = colors.map(color => {
+                const rgb = color.color;
+                return this.getColorName(rgb.red, rgb.green, rgb.blue);
+            });
+            
+            colorDescription = `The dominant colors I see are: ${colorNames.join(', ')}.`;
+        } else {
+            colorDescription = 'I cannot determine the colors in this scene.';
+        }
+        
+        this.updateDescription(colorDescription);
+        this.speakText(colorDescription);
+        this.hapticFeedback('success');
+        this.playAudioBeacon('success');
+        this.updateStatus('✅ Color analysis complete');
+    }
+    
+    processTextAnalysis(visionData) {
+        const response = visionData.responses[0];
+        let textDescription = '';
+        
+        if (response.textAnnotations && response.textAnnotations.length > 0) {
+            const fullText = response.textAnnotations[0].description;
+            textDescription = `I can read the following text: ${fullText}`;
+        } else {
+            textDescription = 'No text was detected in this scene.';
+        }
+        
+        this.updateDescription(textDescription);
+        this.speakText(textDescription);
+        this.hapticFeedback('success');
+        this.playAudioBeacon('success');
+        this.updateStatus('✅ Text reading complete');
+    }
+    
+    getColorName(r, g, b) {
+        const colors = [
+            { name: 'red', r: 255, g: 0, b: 0 },
+            { name: 'green', r: 0, g: 255, b: 0 },
+            { name: 'blue', r: 0, g: 0, b: 255 },
+            { name: 'yellow', r: 255, g: 255, b: 0 },
+            { name: 'orange', r: 255, g: 165, b: 0 },
+            { name: 'purple', r: 128, g: 0, b: 128 },
+            { name: 'pink', r: 255, g: 192, b: 203 },
+            { name: 'brown', r: 165, g: 42, b: 42 },
+            { name: 'black', r: 0, g: 0, b: 0 },
+            { name: 'white', r: 255, g: 255, b: 255 },
+            { name: 'gray', r: 128, g: 128, b: 128 }
+        ];
+        
+        let closestColor = colors[0];
+        let minDistance = this.colorDistance(r, g, b, closestColor.r, closestColor.g, closestColor.b);
+        
+        for (let i = 1; i < colors.length; i++) {
+            const distance = this.colorDistance(r, g, b, colors[i].r, colors[i].g, colors[i].b);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestColor = colors[i];
+            }
+        }
+        
+        return closestColor.name;
+    }
+    
+    colorDistance(r1, g1, b1, r2, g2, b2) {
+        return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
+    }
+    
+    repeatLastResponse() {
+        const description = document.getElementById('description').textContent;
+        if (description && description !== 'Descriptions will appear here...') {
+            this.speakText(description);
+            this.hapticFeedback('short');
+            this.updateStatus('🔄 Repeating last response');
+        } else {
+            this.updateStatus('❌ No previous response to repeat');
+            this.hapticFeedback('error');
+        }
+    }
+    
+    updateStatus(message) {
+        const statusElement = document.getElementById('status');
+        if (statusElement) {
+            statusElement.textContent = message;
+        }
+        console.log('Status:', message);
+    }
+    
+    updateDescription(description) {
+        const descElement = document.getElementById('description');
+        if (descElement) {
+            descElement.textContent = description;
+        }
+    }
+    
+    checkAPIKeys() {
+        if (GOOGLE_VISION_API_KEY.includes('YOUR_') || GOOGLE_VISION_API_KEY === '') {
+            console.warn('Google Vision API key not configured');
+            this.updateStatus('⚠️ Google Vision API key not configured. Some features may not work.');
+        }
+        
+        if (ELEVENLABS_API_KEY.includes('YOUR_') || ELEVENLABS_API_KEY === '') {
+            console.warn('ElevenLabs API key not configured');
         }
     }
 }

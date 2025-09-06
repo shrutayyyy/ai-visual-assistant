@@ -66,110 +66,123 @@
         <section class="quick-start" aria-labelledby="quick-start-heading">
             <h2 id="quick-start-heading">Quick Start</h2>
             <div class="start-actions">
-                <button id="startCamera" class="btn btn-primary btn-large" 
-                        aria-describedby="camera-help"
-                        title="Start your device camera to begin visual analysis">
-                    <span class="btn-icon" aria-hidden="true">📹</span>
-                    Start Camera
-                </button>
+                <div class="camera-controls-row">
+                    <button id="startCamera" class="btn btn-primary btn-large" 
+                            aria-describedby="camera-help"
+                            title="Start your device camera to begin visual analysis">
+                        <span class="btn-icon" aria-hidden="true">📹</span>
+                        Start Camera
+                    </button>
+                    <button id="stopCamera" class="btn btn-secondary btn-large" 
+                            disabled
+                            aria-describedby="stop-camera-help"
+                            title="Stop the camera and disable analysis">
+                        <span class="btn-icon" aria-hidden="true">⏹️</span>
+                        Stop Camera
+                    </button>
+                </div>
                 <p id="camera-help" class="help-text">Allow camera access to begin using VoiceEyes Pro</p>
+                <p id="stop-camera-help" class="help-text sr-only">Stop the camera and disable all analysis features</p>
             </div>
         </section>
 
-        <!-- Feature Categories -->
-        <div class="feature-categories">
-            <!-- Smart Navigation -->
-            <section class="feature-category" aria-labelledby="navigation-heading">
-                <h3 id="navigation-heading" class="category-title">
-                    <span class="category-icon" aria-hidden="true">🧭</span>
-                    Smart Navigation
-                </h3>
-                <div class="feature-buttons" role="group" aria-labelledby="navigation-heading">
-                    <button id="spatialNav" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="spatial-nav-desc"
-                            title="Enable 9-point spatial navigation grid">
-                        <span class="btn-icon" aria-hidden="true">🧭</span>
-                        <span class="btn-text">Spatial Nav</span>
-                    </button>
-                    <button id="distanceMode" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="distance-desc"
-                            title="Enable distance estimation for objects">
-                        <span class="btn-icon" aria-hidden="true">📏</span>
-                        <span class="btn-text">Distance</span>
-                    </button>
-                    <button id="obstacleMode" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="obstacle-desc"
-                            title="Enable obstacle detection and warnings">
-                        <span class="btn-icon" aria-hidden="true">⚠️</span>
-                        <span class="btn-text">Obstacles</span>
-                    </button>
-                </div>
-            </section>
+        <!-- Feature Categories - Compact Grid -->
+        <div class="feature-categories-compact">
+            <!-- Navigation & Analysis Row -->
+            <div class="feature-row">
+                <section class="feature-category-compact" aria-labelledby="navigation-heading">
+                    <h3 id="navigation-heading" class="category-title-compact">
+                        <span class="category-icon" aria-hidden="true">🧭</span>
+                        Navigation
+                    </h3>
+                    <div class="feature-buttons-compact" role="group" aria-labelledby="navigation-heading">
+                        <button id="spatialNav" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="spatial-nav-desc"
+                                title="Enable 9-point spatial navigation grid">
+                            <span class="btn-icon" aria-hidden="true">🧭</span>
+                            <span class="btn-text">Spatial</span>
+                        </button>
+                        <button id="distanceMode" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="distance-desc"
+                                title="Enable distance estimation for objects">
+                            <span class="btn-icon" aria-hidden="true">📏</span>
+                            <span class="btn-text">Distance</span>
+                        </button>
+                        <button id="obstacleMode" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="obstacle-desc"
+                                title="Enable obstacle detection and warnings">
+                            <span class="btn-icon" aria-hidden="true">⚠️</span>
+                            <span class="btn-text">Obstacles</span>
+                        </button>
+                    </div>
+                </section>
 
-            <!-- Visual Analysis -->
-            <section class="feature-category" aria-labelledby="visual-heading">
-                <h3 id="visual-heading" class="category-title">
-                    <span class="category-icon" aria-hidden="true">🎨</span>
-                    Visual Analysis
-                </h3>
-                <div class="feature-buttons" role="group" aria-labelledby="visual-heading">
-                    <button id="contrastMode" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="contrast-desc"
-                            title="Analyze color contrast for accessibility">
-                        <span class="btn-icon" aria-hidden="true">🎨</span>
-                        <span class="btn-text">Contrast</span>
-                    </button>
-                    <button id="readabilityMode" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="readability-desc"
-                            title="Analyze text readability and clarity">
-                        <span class="btn-icon" aria-hidden="true">📖</span>
-                        <span class="btn-text">Readability</span>
-                    </button>
-                    <button id="lightingMode" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="lighting-desc"
-                            title="Analyze lighting conditions and brightness">
-                        <span class="btn-icon" aria-hidden="true">💡</span>
-                        <span class="btn-text">Lighting</span>
-                    </button>
-                </div>
-            </section>
+                <section class="feature-category-compact" aria-labelledby="visual-heading">
+                    <h3 id="visual-heading" class="category-title-compact">
+                        <span class="category-icon" aria-hidden="true">🎨</span>
+                        Analysis
+                    </h3>
+                    <div class="feature-buttons-compact" role="group" aria-labelledby="visual-heading">
+                        <button id="contrastMode" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="contrast-desc"
+                                title="Analyze color contrast for accessibility">
+                            <span class="btn-icon" aria-hidden="true">🎨</span>
+                            <span class="btn-text">Contrast</span>
+                        </button>
+                        <button id="readabilityMode" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="readability-desc"
+                                title="Analyze text readability and clarity">
+                            <span class="btn-icon" aria-hidden="true">📖</span>
+                            <span class="btn-text">Text</span>
+                        </button>
+                        <button id="lightingMode" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="lighting-desc"
+                                title="Analyze lighting conditions and brightness">
+                            <span class="btn-icon" aria-hidden="true">💡</span>
+                            <span class="btn-text">Lighting</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
 
-            <!-- Audio Features -->
-            <section class="feature-category" aria-labelledby="audio-heading">
-                <h3 id="audio-heading" class="category-title">
-                    <span class="category-icon" aria-hidden="true">🔊</span>
-                    Audio Features
-                </h3>
-                <div class="feature-buttons" role="group" aria-labelledby="audio-heading">
-                    <button id="audioBeacon" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="beacon-desc"
-                            title="Enable directional audio beacons">
-                        <span class="btn-icon" aria-hidden="true">🔊</span>
-                        <span class="btn-text">Beacons</span>
-                    </button>
-                    <button id="voiceNav" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="voice-desc"
-                            title="Enable voice command navigation">
-                        <span class="btn-icon" aria-hidden="true">🗣️</span>
-                        <span class="btn-text">Voice Nav</span>
-                    </button>
-                    <button id="soundscape" class="feature-btn" 
-                            aria-pressed="false" 
-                            aria-describedby="soundscape-desc"
-                            title="Enable environmental soundscape">
-                        <span class="btn-icon" aria-hidden="true">🌿</span>
-                        <span class="btn-text">Soundscape</span>
-                    </button>
-                </div>
-            </section>
+            <!-- Audio Features Row -->
+            <div class="feature-row">
+                <section class="feature-category-compact" aria-labelledby="audio-heading">
+                    <h3 id="audio-heading" class="category-title-compact">
+                        <span class="category-icon" aria-hidden="true">🔊</span>
+                        Audio
+                    </h3>
+                    <div class="feature-buttons-compact" role="group" aria-labelledby="audio-heading">
+                        <button id="audioBeacon" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="beacon-desc"
+                                title="Enable directional audio beacons">
+                            <span class="btn-icon" aria-hidden="true">🔊</span>
+                            <span class="btn-text">Beacons</span>
+                        </button>
+                        <button id="voiceNav" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="voice-desc"
+                                title="Enable voice command navigation">
+                            <span class="btn-icon" aria-hidden="true">🗣️</span>
+                            <span class="btn-text">Voice</span>
+                        </button>
+                        <button id="soundscape" class="feature-btn-compact" 
+                                aria-pressed="false" 
+                                aria-describedby="soundscape-desc"
+                                title="Enable environmental soundscape">
+                            <span class="btn-icon" aria-hidden="true">🌿</span>
+                            <span class="btn-text">Ambient</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
         </div>
 
         <!-- Hidden descriptions for screen readers -->
