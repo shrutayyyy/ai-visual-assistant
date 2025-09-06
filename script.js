@@ -54,14 +54,32 @@ class VoiceEyesPro {
     
     setupEventListeners() {
         // Camera controls
-        document.getElementById('startCamera').addEventListener('click', () => this.startCamera());
-        document.getElementById('stopCamera').addEventListener('click', () => this.stopCamera());
-        document.getElementById('switchCamera').addEventListener('click', () => this.showCameraSelector());
-        document.getElementById('captureBtn').addEventListener('click', () => this.captureAndDescribe());
+        document.getElementById('startCamera').addEventListener('click', () => {
+            console.log('Start camera clicked');
+            this.startCamera();
+        });
+        document.getElementById('stopCamera').addEventListener('click', () => {
+            console.log('Stop camera clicked');
+            this.stopCamera();
+        });
+        document.getElementById('switchCamera').addEventListener('click', () => {
+            console.log('Switch camera clicked');
+            this.showCameraSelector();
+        });
+        document.getElementById('captureBtn').addEventListener('click', () => {
+            console.log('Capture button clicked');
+            this.captureAndDescribe();
+        });
         
         // Voice controls
-        document.getElementById('voiceBtn').addEventListener('click', () => this.toggleVoiceCommands());
-        document.getElementById('repeatBtn').addEventListener('click', () => this.repeatLastResponse());
+        document.getElementById('voiceBtn').addEventListener('click', () => {
+            console.log('Voice button clicked');
+            this.toggleVoiceCommands();
+        });
+        document.getElementById('repeatBtn').addEventListener('click', () => {
+            console.log('Repeat button clicked');
+            this.repeatLastResponse();
+        });
         
         // Accessibility toggles
         document.getElementById('darkModeToggle').addEventListener('click', () => this.toggleDarkMode());
@@ -222,6 +240,15 @@ class VoiceEyesPro {
     
     // Enhanced Audio Management with Feedback Prevention
     async speakText(text) {
+        // Prevent multiple simultaneous calls
+        if (this.isSpeaking) {
+            console.log('Already speaking, ignoring new text:', text);
+            return;
+        }
+        
+        // Stop any existing audio first
+        this.stopSpeaking();
+        
         // Stop voice recognition while speaking to prevent feedback loop
         this.stopVoiceListening();
         this.isSpeaking = true;
@@ -323,6 +350,7 @@ class VoiceEyesPro {
     }
     
     stopSpeaking() {
+        // Stop any current audio
         if (this.currentAudio) {
             this.currentAudio.pause();
             this.currentAudio.currentTime = 0;
@@ -330,12 +358,16 @@ class VoiceEyesPro {
             this.currentAudio = null;
         }
         
+        // Stop all speech synthesis
         if ('speechSynthesis' in window) {
             speechSynthesis.cancel();
-            // Speak a silent utterance to ensure cancellation
-            const silentUtterance = new SpeechSynthesisUtterance('');
-            silentUtterance.volume = 0;
-            speechSynthesis.speak(silentUtterance);
+            // Wait a moment for cancellation to complete
+            setTimeout(() => {
+                // Speak a silent utterance to ensure cancellation
+                const silentUtterance = new SpeechSynthesisUtterance('');
+                silentUtterance.volume = 0;
+                speechSynthesis.speak(silentUtterance);
+            }, 100);
         }
         
         this.isSpeaking = false;
@@ -869,14 +901,23 @@ class VoiceEyesPro {
     }
     
     enableCameraControls() {
-        document.getElementById('captureBtn').disabled = false;
         document.getElementById('voiceBtn').disabled = false;
         document.getElementById('repeatBtn').disabled = false;
         document.getElementById('stopCamera').disabled = false;
+        document.getElementById('captureBtn').disabled = false;
+        document.getElementById('stopCamera').style.display = 'inline-flex';
+        document.getElementById('captureBtn').style.display = 'inline-flex';
+        document.getElementById('startCamera').style.display = 'none';
         
+        // Show switch camera button if multiple cameras available
         if (this.currentDevices.length > 1) {
             document.getElementById('switchCamera').disabled = false;
+            document.getElementById('switchCamera').style.display = 'inline-flex';
         }
+        
+        // Show video and hide placeholder
+        document.getElementById('video').style.display = 'block';
+        document.getElementById('cameraPlaceholder').style.display = 'none';
     }
     
     stopCamera() {
@@ -889,17 +930,25 @@ class VoiceEyesPro {
         this.video.pause();
         
         // Disable camera controls
-        document.getElementById('captureBtn').disabled = true;
         document.getElementById('voiceBtn').disabled = true;
         document.getElementById('repeatBtn').disabled = true;
         document.getElementById('stopCamera').disabled = true;
+        document.getElementById('captureBtn').disabled = true;
         document.getElementById('switchCamera').disabled = true;
+        document.getElementById('stopCamera').style.display = 'none';
+        document.getElementById('captureBtn').style.display = 'none';
+        document.getElementById('switchCamera').style.display = 'none';
+        document.getElementById('startCamera').style.display = 'inline-flex';
+        
+        // Show placeholder and hide video
+        document.getElementById('video').style.display = 'none';
+        document.getElementById('cameraPlaceholder').style.display = 'flex';
         
         // Clear overlays
         document.getElementById('cameraOverlay').innerHTML = '';
         document.getElementById('description').textContent = 'Descriptions will appear here...';
         
-        this.updateStatus('📹 Camera stopped. Click "Start Camera" to begin again.');
+        this.updateStatus('📹 Camera stopped. Click "Turn On Camera" to begin again.');
         this.hapticFeedback('short');
         this.playAudioBeacon('info');
     }

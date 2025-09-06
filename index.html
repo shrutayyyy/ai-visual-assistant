@@ -62,126 +62,220 @@
 
     <!-- Main Content -->
     <main id="main-content" class="main-content" role="main">
-        <!-- Quick Start Section -->
-        <section class="quick-start" aria-labelledby="quick-start-heading">
-            <h2 id="quick-start-heading">Quick Start</h2>
-            <div class="start-actions">
-                <div class="camera-controls-row">
-                    <button id="startCamera" class="btn btn-primary btn-large" 
+        <!-- Camera View - Primary Section -->
+        <section class="camera-view" aria-labelledby="camera-heading">
+            <h2 id="camera-heading">Camera View</h2>
+            <p class="camera-description">Activate your camera to start exploring your environment</p>
+            
+            <div class="camera-container">
+            <div class="camera-viewport">
+                <video id="video" 
+                       autoplay 
+                       muted 
+                       playsinline 
+                           aria-label="Live camera feed for visual analysis">
+                </video>
+                <div class="camera-overlay" id="cameraOverlay" aria-hidden="true">
+                    <!-- Object detection boxes will be drawn here -->
+                </div>
+                    <div class="camera-placeholder" id="cameraPlaceholder">
+                        <div class="camera-icon">📷</div>
+            </div>
+                </div>
+                
+                <div class="camera-controls-main">
+                    <button id="startCamera" class="btn-camera-primary" 
                             aria-describedby="camera-help"
                             title="Start your device camera to begin visual analysis">
                         <span class="btn-icon" aria-hidden="true">📹</span>
-                        Start Camera
+                        Turn On Camera
                     </button>
-                    <button id="stopCamera" class="btn btn-secondary btn-large" 
+                    <button id="stopCamera" class="btn-camera-secondary" 
                             disabled
-                            aria-describedby="stop-camera-help"
+                            style="display: none;"
                             title="Stop the camera and disable analysis">
                         <span class="btn-icon" aria-hidden="true">⏹️</span>
-                        Stop Camera
+                        Turn Off Camera
+                    </button>
+                    <button id="switchCamera" class="btn-camera-secondary" 
+                            disabled
+                            style="display: none;"
+                            title="Switch between available cameras">
+                        <span class="btn-icon" aria-hidden="true">🔄</span>
+                        Switch Camera
+                    </button>
+                    <button id="captureBtn" class="btn-camera-primary" 
+                            disabled
+                            style="display: none;"
+                            title="Analyze the current scene with AI">
+                        <span class="btn-icon" aria-hidden="true">🧠</span>
+                        Analyze Scene
                     </button>
                 </div>
-                <p id="camera-help" class="help-text">Allow camera access to begin using VoiceEyes Pro</p>
-                <p id="stop-camera-help" class="help-text sr-only">Stop the camera and disable all analysis features</p>
             </div>
         </section>
 
-        <!-- Feature Categories - Compact Grid -->
-        <div class="feature-categories-compact">
-            <!-- Navigation & Analysis Row -->
-            <div class="feature-row">
-                <section class="feature-category-compact" aria-labelledby="navigation-heading">
-                    <h3 id="navigation-heading" class="category-title-compact">
-                        <span class="category-icon" aria-hidden="true">🧭</span>
-                        Navigation
-                    </h3>
-                    <div class="feature-buttons-compact" role="group" aria-labelledby="navigation-heading">
-                        <button id="spatialNav" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="spatial-nav-desc"
-                                title="Enable 9-point spatial navigation grid">
-                            <span class="btn-icon" aria-hidden="true">🧭</span>
-                            <span class="btn-text">Spatial</span>
-                        </button>
-                        <button id="distanceMode" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="distance-desc"
-                                title="Enable distance estimation for objects">
-                            <span class="btn-icon" aria-hidden="true">📏</span>
-                            <span class="btn-text">Distance</span>
-                        </button>
-                        <button id="obstacleMode" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="obstacle-desc"
-                                title="Enable obstacle detection and warnings">
-                            <span class="btn-icon" aria-hidden="true">⚠️</span>
-                            <span class="btn-text">Obstacles</span>
-                        </button>
-                    </div>
-                </section>
-
-                <section class="feature-category-compact" aria-labelledby="visual-heading">
-                    <h3 id="visual-heading" class="category-title-compact">
-                        <span class="category-icon" aria-hidden="true">🎨</span>
-                        Analysis
-                    </h3>
-                    <div class="feature-buttons-compact" role="group" aria-labelledby="visual-heading">
-                        <button id="contrastMode" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="contrast-desc"
-                                title="Analyze color contrast for accessibility">
-                            <span class="btn-icon" aria-hidden="true">🎨</span>
-                            <span class="btn-text">Contrast</span>
-                        </button>
-                        <button id="readabilityMode" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="readability-desc"
-                                title="Analyze text readability and clarity">
-                            <span class="btn-icon" aria-hidden="true">📖</span>
-                            <span class="btn-text">Text</span>
-                        </button>
-                        <button id="lightingMode" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="lighting-desc"
-                                title="Analyze lighting conditions and brightness">
-                            <span class="btn-icon" aria-hidden="true">💡</span>
-                            <span class="btn-text">Lighting</span>
-                        </button>
-                    </div>
-                </section>
+        <!-- Voice Assistant Controls -->
+        <section class="voice-assistant" aria-labelledby="voice-heading">
+            <h2 id="voice-heading">Voice Assistant</h2>
+            <p class="voice-description">Ask me questions or say "describe scene" to analyze what I see</p>
+            
+            <div class="voice-controls-main">
+                <button id="voiceBtn" class="btn-voice-primary" 
+                        disabled 
+                        aria-pressed="false"
+                        title="Toggle voice command listening">
+                    <span class="btn-icon" aria-hidden="true">🎤</span>
+                    Voice Command
+                </button>
+                <button id="repeatBtn" class="btn-voice-secondary" 
+                        disabled 
+                        title="Repeat the last AI response">
+                    <span class="btn-icon" aria-hidden="true">🔊</span>
+                    Repeat
+                </button>
             </div>
 
-            <!-- Audio Features Row -->
-            <div class="feature-row">
-                <section class="feature-category-compact" aria-labelledby="audio-heading">
-                    <h3 id="audio-heading" class="category-title-compact">
-                        <span class="category-icon" aria-hidden="true">🔊</span>
-                        Audio
-                    </h3>
-                    <div class="feature-buttons-compact" role="group" aria-labelledby="audio-heading">
-                        <button id="audioBeacon" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="beacon-desc"
-                                title="Enable directional audio beacons">
-                            <span class="btn-icon" aria-hidden="true">🔊</span>
-                            <span class="btn-text">Beacons</span>
-                        </button>
-                        <button id="voiceNav" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="voice-desc"
-                                title="Enable voice command navigation">
-                            <span class="btn-icon" aria-hidden="true">🗣️</span>
-                            <span class="btn-text">Voice</span>
-                        </button>
-                        <button id="soundscape" class="feature-btn-compact" 
-                                aria-pressed="false" 
-                                aria-describedby="soundscape-desc"
-                                title="Enable environmental soundscape">
-                            <span class="btn-icon" aria-hidden="true">🌿</span>
-                            <span class="btn-text">Ambient</span>
-                        </button>
-                    </div>
-                </section>
+            <div class="voice-suggestions">
+                <p class="suggestions-label">Try saying:</p>
+                <div class="phrase-buttons">
+                    <button class="phrase-btn" 
+                            data-phrase="describe the scene"
+                            title="Ask AI to describe what it sees">
+                        Describe the scene
+                    </button>
+                    <button class="phrase-btn" 
+                            data-phrase="what colors do you see"
+                            title="Ask AI to identify colors in the scene">
+                        What colors do you see?
+                    </button>
+                    <button class="phrase-btn" 
+                            data-phrase="read the text"
+                            title="Ask AI to read any text in the scene">
+                        Read the text
+                    </button>
+                    <button class="phrase-btn" 
+                            data-phrase="what's in front of me"
+                            title="Ask AI to describe what's directly in front">
+                        What's in front of me?
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis Controls -->
+        <section class="analysis-controls" aria-labelledby="analysis-heading">
+            <h2 id="analysis-heading">Analysis Features</h2>
+            <div class="feature-toggles">
+                <button id="spatialNav" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Enable 9-point spatial navigation grid">
+                    <span class="toggle-icon">🧭</span>
+                    <span class="toggle-label">Spatial Nav</span>
+                </button>
+                <button id="distanceMode" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Enable distance estimation for objects">
+                    <span class="toggle-icon">📏</span>
+                    <span class="toggle-label">Distance</span>
+                </button>
+                <button id="obstacleMode" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Enable obstacle detection and warnings">
+                    <span class="toggle-icon">⚠️</span>
+                    <span class="toggle-label">Obstacles</span>
+                </button>
+                <button id="contrastMode" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Analyze color contrast for accessibility">
+                    <span class="toggle-icon">🎨</span>
+                    <span class="toggle-label">Contrast</span>
+                </button>
+                <button id="readabilityMode" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Analyze text readability and clarity">
+                    <span class="toggle-icon">📖</span>
+                    <span class="toggle-label">Text</span>
+                </button>
+                <button id="lightingMode" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Analyze lighting conditions and brightness">
+                    <span class="toggle-icon">💡</span>
+                    <span class="toggle-label">Lighting</span>
+                </button>
+                <button id="audioBeacon" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Enable directional audio beacons">
+                    <span class="toggle-icon">🔊</span>
+                    <span class="toggle-label">Audio</span>
+                </button>
+                <button id="voiceNav" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Enable voice navigation commands">
+                    <span class="toggle-icon">🗣️</span>
+                    <span class="toggle-label">Voice Nav</span>
+                </button>
+                <button id="soundscape" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Enable environmental soundscape">
+                    <span class="toggle-icon">🌊</span>
+                    <span class="toggle-label">Soundscape</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Accessibility Controls -->
+        <section class="accessibility-controls" aria-labelledby="accessibility-heading">
+            <h2 id="accessibility-heading">Accessibility Settings</h2>
+            <div class="accessibility-toggles">
+                <button id="darkModeToggle" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Toggle dark mode">
+                    <span class="toggle-icon">🌙</span>
+                    <span class="toggle-label">Dark Mode</span>
+                </button>
+                <button id="highContrastToggle" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Toggle high contrast mode">
+                    <span class="toggle-icon">🔆</span>
+                    <span class="toggle-label">High Contrast</span>
+                </button>
+                <button id="fontSizeToggle" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Toggle large font size">
+                    <span class="toggle-icon">🔍</span>
+                    <span class="toggle-label">Large Text</span>
+                </button>
+                <button id="hapticToggle" class="feature-toggle" 
+                        aria-pressed="false" 
+                        title="Toggle haptic feedback">
+                    <span class="toggle-icon">📳</span>
+                    <span class="toggle-label">Haptic</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Spatial Navigation Panel -->
+        <div class="spatial-panel" id="spatialPanel" style="display: none;" 
+             role="region" 
+             aria-labelledby="spatial-nav-title">
+            <h3 id="spatial-nav-title">Spatial Navigation</h3>
+            <div class="navigation-grid" id="navigationGrid" role="grid">
+                <!-- Navigation points will be generated here -->
+            </div>
+            <div class="navigation-controls">
+                <button class="nav-btn" id="scanLeft" title="Scan left side">
+                    <span class="btn-icon">⬅️</span>
+                    Left
+                </button>
+                <button class="nav-btn" id="scanCenter" title="Scan center">
+                    <span class="btn-icon">⬆️</span>
+                    Center
+                </button>
+                <button class="nav-btn" id="scanRight" title="Scan right side">
+                    <span class="btn-icon">➡️</span>
+                    Right
+                </button>
             </div>
         </div>
 
@@ -196,194 +290,14 @@
         <div id="voice-desc" class="sr-only">Voice command navigation and control</div>
         <div id="soundscape-desc" class="sr-only">Environmental soundscape for enhanced awareness</div>
 
-        <!-- Camera Interface -->
-        <section class="camera-interface" aria-labelledby="camera-heading">
-            <h2 id="camera-heading">Camera Interface</h2>
-            
-            <div class="camera-status">
-                <div class="status-indicator" id="modeIndicator" role="status" aria-live="polite">
-                    <span class="status-icon" aria-hidden="true">📹</span>
-                    <span class="status-text">Ready</span>
-                </div>
-                <div class="camera-stats" id="cameraStats" aria-live="polite">
-                    <div class="stat">
-                        <span class="stat-label">Objects detected:</span>
-                        <span class="stat-value" id="objectCount" aria-label="Number of objects detected">0</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-label">Distance:</span>
-                        <span class="stat-value" id="distanceValue" aria-label="Estimated distance to objects">N/A</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="camera-viewport">
-                <video id="video" 
-                       autoplay 
-                       muted 
-                       playsinline 
-                       aria-label="Live camera feed for visual analysis"
-                       aria-describedby="camera-description">
-                </video>
-                <div class="camera-overlay" id="cameraOverlay" aria-hidden="true">
-                    <!-- Object detection boxes will be drawn here -->
-                </div>
-                <p id="camera-description" class="sr-only">Live camera feed showing your environment for AI analysis</p>
-            </div>
-
-            <!-- Camera Controls -->
-            <div class="camera-controls" role="group" aria-label="Camera controls">
-                <button id="switchCamera" class="btn btn-secondary" 
-                        disabled
-                        aria-describedby="switch-camera-desc"
-                        title="Switch between available cameras">
-                    <span class="btn-icon" aria-hidden="true">🔄</span>
-                    Switch Camera
-                </button>
-                <button id="captureBtn" class="btn btn-primary btn-large" 
-                        disabled 
-                        aria-describedby="analyze-desc"
-                        title="Analyze the current scene with AI">
-                    <span class="btn-icon" aria-hidden="true">🧠</span>
-                    Analyze Scene
-                </button>
-            </div>
-
-            <!-- Spatial Navigation Panel -->
-            <div class="spatial-panel" id="spatialPanel" style="display: none;" 
-                 role="region" 
-                 aria-labelledby="spatial-nav-title"
-                 aria-describedby="spatial-nav-desc">
-                <h3 id="spatial-nav-title">Spatial Navigation</h3>
-                <p id="spatial-nav-desc" class="sr-only">9-point navigation grid for precise object location</p>
-                <div class="navigation-grid" id="navigationGrid" role="grid" aria-label="Spatial navigation grid">
-                    <!-- Navigation points will be generated here -->
-                </div>
-                <div class="navigation-controls" role="group" aria-label="Directional scanning">
-                    <button class="nav-btn" id="scanLeft" 
-                            aria-label="Scan left side of the scene"
-                            title="Scan left side of the scene">
-                        <span class="btn-icon" aria-hidden="true">⬅️</span>
-                        Left
-                    </button>
-                    <button class="nav-btn" id="scanCenter" 
-                            aria-label="Scan center of the scene"
-                            title="Scan center of the scene">
-                        <span class="btn-icon" aria-hidden="true">⬆️</span>
-                        Center
-                    </button>
-                    <button class="nav-btn" id="scanRight" 
-                            aria-label="Scan right side of the scene"
-                            title="Scan right side of the scene">
-                        <span class="btn-icon" aria-hidden="true">➡️</span>
-                        Right
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Voice Interface -->
-        <section class="voice-interface" aria-labelledby="voice-heading">
-            <h2 id="voice-heading">Voice Commands</h2>
-            
-            <div class="voice-controls" role="group" aria-label="Voice controls">
-                <button id="voiceBtn" class="btn btn-secondary" 
-                        disabled 
-                        aria-pressed="false"
-                        aria-describedby="voice-desc"
-                        title="Toggle voice command listening">
-                    <span class="btn-icon" aria-hidden="true">🎤</span>
-                    Voice Commands
-                </button>
-                <button id="repeatBtn" class="btn btn-outline" 
-                        disabled 
-                        aria-describedby="repeat-desc"
-                        title="Repeat the last AI response">
-                    <span class="btn-icon" aria-hidden="true">🔄</span>
-                    Repeat
-                </button>
-            </div>
-
-            <div class="voice-suggestions">
-                <h3>Try saying:</h3>
-                <div class="phrase-buttons" role="group" aria-label="Suggested voice commands">
-                    <button class="phrase-btn" 
-                            data-phrase="describe the scene"
-                            aria-describedby="describe-desc"
-                            title="Ask AI to describe what it sees">
-                        What do you see?
-                    </button>
-                    <button class="phrase-btn" 
-                            data-phrase="read the text"
-                            aria-describedby="read-desc"
-                            title="Ask AI to read any text in the scene">
-                        Read the text
-                    </button>
-                    <button class="phrase-btn" 
-                            data-phrase="what colors do you see"
-                            aria-describedby="colors-desc"
-                            title="Ask AI to identify colors in the scene">
-                        What colors do you see?
-                    </button>
-                    <button class="phrase-btn" 
-                            data-phrase="what's in front of me"
-                            aria-describedby="front-desc"
-                            title="Ask AI to describe what's directly in front">
-                        What's in front of me?
-                    </button>
-                </div>
-            </div>
-
-            <!-- Hidden descriptions for screen readers -->
-            <div id="switch-camera-desc" class="sr-only">Switch between available cameras on your device</div>
-            <div id="analyze-desc" class="sr-only">Analyze the current scene with AI vision</div>
-            <div id="voice-desc" class="sr-only">Enable voice command listening mode</div>
-            <div id="repeat-desc" class="sr-only">Repeat the last AI response</div>
-            <div id="describe-desc" class="sr-only">Ask AI to describe the current scene</div>
-            <div id="read-desc" class="sr-only">Ask AI to read any text visible in the scene</div>
-            <div id="colors-desc" class="sr-only">Ask AI to identify colors in the scene</div>
-            <div id="front-desc" class="sr-only">Ask AI to describe what's directly in front of you</div>
-        </section>
-
         <!-- Status and Description -->
         <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true">
-            Click "Start Camera" to begin
+            Click "Turn On Camera" to begin
         </div>
 
         <div class="description-box" id="description" aria-live="polite">
             Descriptions will appear here...
         </div>
-
-        <!-- Accessibility Info -->
-        <section class="accessibility-info" aria-labelledby="accessibility-heading">
-            <h2 id="accessibility-heading">♿ Accessibility Features</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <h3>🎯 Smart Navigation</h3>
-                    <p>9-point spatial grid for precise object location and navigation assistance.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>📏 Distance Estimation</h3>
-                    <p>AI-powered distance calculation for safe navigation and spatial awareness.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>⚠️ Obstacle Detection</h3>
-                    <p>Real-time identification of potential obstacles and safety hazards.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🎨 Visual Analysis</h3>
-                    <p>Advanced contrast, readability, and lighting analysis for optimal visibility.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>🔊 Audio Beacons</h3>
-                    <p>Directional sound cues and environmental soundscapes for enhanced awareness.</p>
-                </div>
-                <div class="feature-card">
-                    <h3>📳 Haptic Feedback</h3>
-                    <p>Vibration patterns for tactile feedback and confirmation of actions.</p>
-                </div>
-            </div>
-        </section>
     </main>
 
     <!-- Mobile Camera Controls Modal -->
