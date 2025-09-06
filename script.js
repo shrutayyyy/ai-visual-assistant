@@ -80,6 +80,10 @@ class VoiceEyesPro {
             console.log('Repeat button clicked');
             this.repeatLastResponse();
         });
+        document.getElementById('stopSpeakingBtn').addEventListener('click', () => {
+            console.log('Stop speaking button clicked');
+            this.stopSpeaking();
+        });
         
         // Accessibility toggles
         document.getElementById('darkModeToggle').addEventListener('click', () => this.toggleDarkMode());
@@ -253,13 +257,20 @@ class VoiceEyesPro {
         this.stopVoiceListening();
         this.isSpeaking = true;
         
+        // Show stop speaking button
+        document.getElementById('stopSpeakingBtn').style.display = 'inline-flex';
+        
         // Wait to ensure all audio is stopped
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Use ElevenLabs for better voice quality
         const useElevenLabs = true;
         
-        if (useElevenLabs && !ELEVENLABS_API_KEY.includes('YOUR_')) {
+        console.log('ElevenLabs API Key:', ELEVENLABS_API_KEY);
+        console.log('ElevenLabs Voice ID:', ELEVENLABS_VOICE_ID);
+        
+        if (useElevenLabs && !ELEVENLABS_API_KEY.includes('YOUR_') && ELEVENLABS_API_KEY.length > 20) {
+            console.log('Attempting to use ElevenLabs TTS...');
             try {
                 // Add timeout to prevent hanging
                 const controller = new AbortController();
@@ -345,6 +356,7 @@ class VoiceEyesPro {
                 this.fallbackTTS(text);
             }
         } else {
+            console.log('Using fallback TTS (ElevenLabs not available)');
             this.fallbackTTS(text);
         }
     }
@@ -371,6 +383,9 @@ class VoiceEyesPro {
         }
         
         this.isSpeaking = false;
+        
+        // Hide stop speaking button
+        document.getElementById('stopSpeakingBtn').style.display = 'none';
     }
     
     fallbackTTS(text) {

@@ -429,6 +429,27 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-voice-stop {
+  background: #dc2626;
+  color: white;
+  border: 1px solid #dc2626;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-voice-stop:hover:not(:disabled) {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
 .voice-suggestions {
   text-align: left;
 }
