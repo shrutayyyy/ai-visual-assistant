@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceEyes Pro - AI Visual Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Header with Accessibility Controls -->
+    <header class="header">
+        <div class="header-content">
+            <h1>🎯 VoiceEyes Pro</h1>
+            <p class="subtitle">Advanced AI Visual Assistant for Accessibility</p>
+            
+            <div class="header-controls">
+                <button id="highContrastToggle" class="accessibility-btn" aria-label="Toggle high contrast mode">
+                    🌓 High Contrast
+                </button>
+                <button id="fontSizeToggle" class="accessibility-btn" aria-label="Toggle large font mode">
+                    🔍 Large Font
+                </button>
+                <button id="hapticToggle" class="accessibility-btn" aria-label="Toggle haptic feedback">
+                    📳 Haptic
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content">
+        <!-- Instructions Section -->
+        <section class="instructions-section" aria-labelledby="instructions-heading">
+            <h2 id="instructions-heading">🚀 Getting Started</h2>
+            <div class="instruction-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <p>Click "Start Camera" to begin</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <p>Use voice commands or click buttons</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <p>Explore advanced accessibility features</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accessibility Toolbar -->
+        <section class="accessibility-toolbar" aria-labelledby="toolbar-heading">
+            <h2 id="toolbar-heading" class="sr-only">Accessibility Features</h2>
+            
+            <div class="toolbar-section">
+                <h3>🧭 Smart Navigation</h3>
+                <button id="spatialNav" class="toolbar-btn" aria-label="Toggle spatial navigation">
+                    <span class="btn-icon">🧭</span>
+                    <span class="btn-text">Spatial Nav</span>
+                </button>
+                <button id="distanceMode" class="toolbar-btn" aria-label="Toggle distance estimation">
+                    <span class="btn-icon">📏</span>
+                    <span class="btn-text">Distance</span>
+                </button>
+                <button id="obstacleMode" class="toolbar-btn" aria-label="Toggle obstacle detection">
+                    <span class="btn-icon">⚠️</span>
+                    <span class="btn-text">Obstacles</span>
+                </button>
+            </div>
+
+            <div class="toolbar-section">
+                <h3>🎨 Visual Analysis</h3>
+                <button id="contrastMode" class="toolbar-btn" aria-label="Toggle contrast analysis">
+                    <span class="btn-icon">🎨</span>
+                    <span class="btn-text">Contrast</span>
+                </button>
+                <button id="readabilityMode" class="toolbar-btn" aria-label="Toggle text readability analysis">
+                    <span class="btn-icon">📖</span>
+                    <span class="btn-text">Readability</span>
+                </button>
+                <button id="lightingMode" class="toolbar-btn" aria-label="Toggle lighting analysis">
+                    <span class="btn-icon">💡</span>
+                    <span class="btn-text">Lighting</span>
+                </button>
+            </div>
+
+            <div class="toolbar-section">
+                <h3>🔊 Audio Features</h3>
+                <button id="audioBeacon" class="toolbar-btn" aria-label="Toggle audio beacons">
+                    <span class="btn-icon">🔊</span>
+                    <span class="btn-text">Beacons</span>
+                </button>
+                <button id="voiceNav" class="toolbar-btn" aria-label="Toggle voice navigation">
+                    <span class="btn-icon">🗣️</span>
+                    <span class="btn-text">Voice Nav</span>
+                </button>
+                <button id="soundscape" class="toolbar-btn" aria-label="Toggle environmental soundscape">
+                    <span class="btn-icon">🌿</span>
+                    <span class="btn-text">Soundscape</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Camera Section -->
+        <section class="camera-section" aria-labelledby="camera-heading">
+            <h2 id="camera-heading" class="sr-only">Camera Interface</h2>
+            
+            <div class="camera-modes">
+                <div class="mode-indicator" id="modeIndicator">
+                    <span class="mode-text">Ready</span>
+                </div>
+                <div class="camera-stats" id="cameraStats">
+                    <div class="stat">
+                        <span class="stat-label">Objects:</span>
+                        <span class="stat-value" id="objectCount">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Distance:</span>
+                        <span class="stat-value" id="distanceValue">N/A</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="camera-container">
+                <video id="video" autoplay muted playsinline aria-label="Camera feed"></video>
+                <div class="camera-overlay" id="cameraOverlay">
+                    <!-- Object detection boxes will be drawn here -->
+                </div>
+            </div>
+
+            <!-- Camera Controls -->
+            <div class="camera-controls">
+                <button id="startCamera" class="btn btn-primary" aria-label="Start camera">
+                    📹 Start Camera
+                </button>
+                <button id="switchCamera" class="btn btn-secondary" aria-label="Switch camera">
+                    🔄 Switch Camera
+                </button>
+                <button id="captureBtn" class="btn btn-green" disabled aria-label="Smart analyze scene">
+                    🧠 Smart Analyze
+                </button>
+            </div>
+
+            <!-- Spatial Navigation Panel -->
+            <div class="spatial-panel" id="spatialPanel" style="display: none;">
+                <h3>🧭 Spatial Navigation</h3>
+                <div class="navigation-grid" id="navigationGrid">
+                    <!-- Navigation points will be generated here -->
+                </div>
+                <div class="navigation-controls">
+                    <button class="nav-btn" id="scanLeft" aria-label="Scan left">
+                        ⬅️ Left
+                    </button>
+                    <button class="nav-btn" id="scanCenter" aria-label="Scan center">
+                        ⬆️ Center
+                    </button>
+                    <button class="nav-btn" id="scanRight" aria-label="Scan right">
+                        ➡️ Right
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Voice Interface -->
+        <section class="voice-interface" aria-labelledby="voice-heading">
+            <h2 id="voice-heading" class="sr-only">Voice Commands</h2>
+            
+            <div class="voice-controls">
+                <button id="voiceBtn" class="btn btn-blue" disabled aria-label="Toggle voice commands">
+                    🎤 Voice Commands
+                </button>
+                <button id="repeatBtn" class="btn btn-white" disabled aria-label="Repeat last response">
+                    🔄 Repeat
+                </button>
+            </div>
+
+            <div class="suggested-phrases">
+                <h3>💬 Try saying:</h3>
+                <div class="phrase-buttons">
+                    <button class="phrase-btn" data-phrase="describe the scene">
+                        What do you see?
+                    </button>
+                    <button class="phrase-btn" data-phrase="read the text">
+                        Read the text
+                    </button>
+                    <button class="phrase-btn" data-phrase="what colors do you see">
+                        What colors do you see?
+                    </button>
+                    <button class="phrase-btn" data-phrase="what's in front of me">
+                        What's in front of me?
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Status and Description -->
+        <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true">
+            Click "Start Camera" to begin
+        </div>
+
+        <div class="description-box" id="description" aria-live="polite">
+            Descriptions will appear here...
+        </div>
+
+        <!-- Accessibility Info -->
+        <section class="accessibility-info" aria-labelledby="accessibility-heading">
+            <h2 id="accessibility-heading">♿ Accessibility Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🎯 Smart Navigation</h3>
+                    <p>9-point spatial grid for precise object location and navigation assistance.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📏 Distance Estimation</h3>
+                    <p>AI-powered distance calculation for safe navigation and spatial awareness.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚠️ Obstacle Detection</h3>
+                    <p>Real-time identification of potential obstacles and safety hazards.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎨 Visual Analysis</h3>
+                    <p>Advanced contrast, readability, and lighting analysis for optimal visibility.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔊 Audio Beacons</h3>
+                    <p>Directional sound cues and environmental soundscapes for enhanced awareness.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📳 Haptic Feedback</h3>
+                    <p>Vibration patterns for tactile feedback and confirmation of actions.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Mobile Camera Controls Modal -->
+    <div class="mobile-camera-controls" id="mobileControls" style="display: none;">
+        <div class="mobile-controls-content">
+            <h3>📱 Mobile Gestures</h3>
+            <div class="gesture-list">
+                <div class="gesture-item">
+                    <span class="gesture-icon">👆</span>
+                    <span class="gesture-text">Double tap to capture</span>
+                </div>
+                <div class="gesture-item">
+                    <span class="gesture-icon">👆</span>
+                    <span class="gesture-text">Long press for voice command</span>
+                </div>
+                <div class="gesture-item">
+                    <span class="gesture-icon">📱</span>
+                    <span class="gesture-text">Shake device to capture</span>
+                </div>
+                <div class="gesture-item">
+                    <span class="gesture-icon">🤏</span>
+                    <span class="gesture-text">Pinch to change modes</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="this.parentElement.parentElement.style.display='none'">
+                Got it!
+            </button>
+        </div>
+    </div>
+
+    <!-- Camera Selector Modal -->
+    <div class="camera-selector-modal" id="cameraSelector" style="display: none;">
+        <div class="camera-selector-content">
+            <h3>📷 Select Camera</h3>
+            <div class="camera-list" id="cameraList">
+                <!-- Camera options will be populated here -->
+            </div>
+            <button class="btn btn-secondary" onclick="document.getElementById('cameraSelector').style.display='none'">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Permission Help Modal -->
+    <div class="permission-help-modal" id="permissionHelp" style="display: none;">
+        <div class="permission-help-content">
+            <h3>📷 Camera Permission Required</h3>
+            <p>VoiceEyes Pro needs camera access to analyze your environment. Please:</p>
+            <ol>
+                <li>Click "Allow" when prompted for camera permission</li>
+                <li>Refresh the page if you accidentally denied permission</li>
+                <li>Check your browser settings if issues persist</li>
+            </ol>
+            <button class="btn btn-primary" onclick="document.getElementById('permissionHelp').style.display='none'">
+                I understand
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>

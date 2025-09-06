@@ -207,6 +207,7 @@
             <button id="startCamera" class="btn btn-primary">📹 Start Camera</button>
             <button id="captureBtn" class="btn btn-secondary" disabled>📸 Describe Scene</button>
             <button id="readTextBtn" class="btn btn-secondary" disabled>📖 Read Text</button>
+            <button id="voiceBtn" class="btn btn-secondary" disabled>🎤 Voice Commands</button>
         </div>
 
         <div class="status" id="status">
@@ -230,6 +231,10 @@
                 this.canvas = document.createElement('canvas');
                 this.ctx = this.canvas.getContext('2d');
                 this.stream = null;
+                this.recognition = null;
+                this.isListening = false;
+                this.isSpeaking = false;
+                this.currentAudio = null;
                 
                 this.setupEventListeners();
                 this.checkAPIKeys();
@@ -247,6 +252,7 @@
                 document.getElementById('startCamera').addEventListener('click', () => this.startCamera());
                 document.getElementById('captureBtn').addEventListener('click', () => this.captureAndDescribe());
                 document.getElementById('readTextBtn').addEventListener('click', () => this.captureAndReadText());
+                document.getElementById('voiceBtn').addEventListener('click', () => this.toggleVoiceCommands());
                 
                 // Voice commands (if supported)
                 if ('webkitSpeechRecognition' in window) {
@@ -271,6 +277,7 @@
                     document.getElementById('startCamera').disabled = true;
                     document.getElementById('captureBtn').disabled = false;
                     document.getElementById('readTextBtn').disabled = false;
+                    document.getElementById('voiceBtn').disabled = false;
                     
                 } catch (error) {
                     console.error('Camera error:', error);
@@ -406,6 +413,10 @@
             }
 
             async speakText(text) {
+                // Stop voice recognition while speaking to prevent feedback
+                this.stopVoiceListening();
+                this.isSpeaking = true;
+                
                 if (!ELEVENLABS_API_KEY.includes('YOUR_')) {
                     try {
                         const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
@@ -428,12 +439,33 @@
                         if (response.ok) {
                             const audioBlob = await response.blob();
                             const audioUrl = URL.createObjectURL(audioBlob);
-                            const audio = new Audio(audioUrl);
-                            audio.play();
+                            this.currentAudio = new Audio(audioUrl);
+                            
+                            // Set up event handlers
+                            this.currentAudio.onended = () => {
+                                URL.revokeObjectURL(audioUrl);
+                                this.currentAudio = null;
+                                this.isSpeaking = false;
+                                // Restart voice recognition after speaking ends
+                                this.startVoiceListening();
+                            };
+                            
+                            this.currentAudio.onerror = (error) => {
+                                console.error('Audio playback error:', error);
+                                URL.revokeObjectURL(audioUrl);
+                                this.currentAudio = null;
+                                this.isSpeaking = false;
+                                // Fallback to browser TTS on audio error
+                                this.fallbackTTS(text);
+                            };
+                            
+                            await this.currentAudio.play();
+                        } else {
+                            console.warn('ElevenLabs API response not ok:', response.status);
+                            this.fallbackTTS(text);
                         }
                     } catch (error) {
                         console.error('ElevenLabs TTS error:', error);
-                        // Fallback to browser TTS
                         this.fallbackTTS(text);
                     }
                 } else {
@@ -447,17 +479,34 @@
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.rate = 0.8;
                     utterance.pitch = 1;
+                    
+                    utterance.onend = () => {
+                        this.isSpeaking = false;
+                        // Restart voice recognition after speaking ends
+                        this.startVoiceListening();
+                    };
+                    
+                    utterance.onerror = () => {
+                        this.isSpeaking = false;
+                        this.startVoiceListening();
+                    };
+                    
                     speechSynthesis.speak(utterance);
+                } else {
+                    this.isSpeaking = false;
+                    this.startVoiceRecognition();
                 }
             }
 
             setupVoiceCommands() {
-                const recognition = new webkitSpeechRecognition();
-                recognition.continuous = true;
-                recognition.interimResults = false;
+                this.recognition = new webkitSpeechRecognition();
+                this.recognition.continuous = false; // Don't listen continuously
+                this.recognition.interimResults = false;
+                this.isListening = false;
                 
-                recognition.onresult = (event) => {
+                this.recognition.onresult = (event) => {
                     const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                    console.log('Voice command heard:', command);
                     
                     if (command.includes('describe') || command.includes('scene')) {
                         this.captureAndDescribe();
@@ -466,7 +515,42 @@
                     }
                 };
                 
-                recognition.start();
+                this.recognition.onend = () => {
+                    this.isListening = false;
+                    this.updateStatus('Voice recognition stopped');
+                };
+                
+                this.recognition.onerror = (event) => {
+                    console.error('Voice recognition error:', event.error);
+                    this.isListening = false;
+                    this.updateStatus('Voice recognition error');
+                };
+            }
+            
+            startVoiceListening() {
+                if (!this.isListening && this.recognition) {
+                    this.recognition.start();
+                    this.isListening = true;
+                    this.updateStatus('🎤 Listening for voice commands...');
+                }
+            }
+            
+            stopVoiceListening() {
+                if (this.isListening && this.recognition) {
+                    this.recognition.stop();
+                    this.isListening = false;
+                }
+            }
+            
+            toggleVoiceCommands() {
+                if (this.isListening) {
+                    this.stopVoiceListening();
+                    document.getElementById('voiceBtn').textContent = '🎤 Voice Commands';
+                    this.updateStatus('Voice commands disabled');
+                } else {
+                    this.startVoiceListening();
+                    document.getElementById('voiceBtn').textContent = '🔇 Stop Listening';
+                }
             }
 
             updateStatus(message, loading = false) {
