@@ -18,6 +18,7 @@ class VoiceEyesPro {
         this.isProcessingVoiceCommand = false;
         
         // Accessibility features
+        this.darkModeEnabled = false;
         this.highContrastEnabled = false;
         this.largeFontEnabled = false;
         this.hapticEnabled = true;
@@ -48,6 +49,7 @@ class VoiceEyesPro {
         this.setupAdvancedFeatures();
         this.checkAPIKeys();
         this.detectMobileDevice();
+        this.initializeTheme();
     }
     
     setupEventListeners() {
@@ -61,6 +63,7 @@ class VoiceEyesPro {
         document.getElementById('repeatBtn').addEventListener('click', () => this.repeatLastResponse());
         
         // Accessibility toggles
+        document.getElementById('darkModeToggle').addEventListener('click', () => this.toggleDarkMode());
         document.getElementById('highContrastToggle').addEventListener('click', () => this.toggleHighContrast());
         document.getElementById('fontSizeToggle').addEventListener('click', () => this.toggleLargeFont());
         document.getElementById('hapticToggle').addEventListener('click', () => this.toggleHaptic());
@@ -638,6 +641,151 @@ class VoiceEyesPro {
                     modal.style.display = 'none';
                 }
             });
+        }
+    }
+    
+    // Accessibility Toggle Methods
+    toggleDarkMode() {
+        this.darkModeEnabled = !this.darkModeEnabled;
+        document.documentElement.setAttribute('data-theme', this.darkModeEnabled ? 'dark' : 'light');
+        document.getElementById('darkModeToggle').setAttribute('aria-pressed', this.darkModeEnabled);
+        document.getElementById('darkModeToggle').classList.toggle('active', this.darkModeEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.darkModeEnabled ? '🌙 Dark mode enabled' : '☀️ Light mode enabled');
+        
+        // Save preference to localStorage
+        localStorage.setItem('voiceEyesDarkMode', this.darkModeEnabled);
+    }
+    
+    toggleHighContrast() {
+        this.highContrastEnabled = !this.highContrastEnabled;
+        document.documentElement.setAttribute('data-theme', this.highContrastEnabled ? 'high-contrast' : 'light');
+        document.getElementById('highContrastToggle').setAttribute('aria-pressed', this.highContrastEnabled);
+        document.getElementById('highContrastToggle').classList.toggle('active', this.highContrastEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.highContrastEnabled ? '🌓 High contrast mode enabled' : 'High contrast mode disabled');
+    }
+    
+    toggleLargeFont() {
+        this.largeFontEnabled = !this.largeFontEnabled;
+        document.body.classList.toggle('large-font', this.largeFontEnabled);
+        document.getElementById('fontSizeToggle').setAttribute('aria-pressed', this.largeFontEnabled);
+        document.getElementById('fontSizeToggle').classList.toggle('active', this.largeFontEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.largeFontEnabled ? '🔍 Large font mode enabled' : 'Large font mode disabled');
+    }
+    
+    toggleHaptic() {
+        this.hapticEnabled = !this.hapticEnabled;
+        document.getElementById('hapticToggle').setAttribute('aria-pressed', this.hapticEnabled);
+        document.getElementById('hapticToggle').classList.toggle('active', this.hapticEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.hapticEnabled ? '📳 Haptic feedback enabled' : 'Haptic feedback disabled');
+    }
+    
+    toggleSpatialNav() {
+        this.spatialNavEnabled = !this.spatialNavEnabled;
+        document.getElementById('spatialNav').setAttribute('aria-pressed', this.spatialNavEnabled);
+        document.getElementById('spatialNav').classList.toggle('active', this.spatialNavEnabled);
+        document.getElementById('spatialPanel').style.display = this.spatialNavEnabled ? 'block' : 'none';
+        this.hapticFeedback('short');
+        this.updateStatus(this.spatialNavEnabled ? '🧭 Spatial navigation enabled - 9-point grid active' : 'Spatial navigation disabled');
+        this.updateModeIndicator();
+    }
+    
+    toggleDistanceMode() {
+        this.distanceModeEnabled = !this.distanceModeEnabled;
+        document.getElementById('distanceMode').setAttribute('aria-pressed', this.distanceModeEnabled);
+        document.getElementById('distanceMode').classList.toggle('active', this.distanceModeEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.distanceModeEnabled ? '📏 Distance estimation enabled - Measuring object distances' : 'Distance estimation disabled');
+        this.updateModeIndicator();
+    }
+    
+    toggleObstacleMode() {
+        this.obstacleModeEnabled = !this.obstacleModeEnabled;
+        document.getElementById('obstacleMode').setAttribute('aria-pressed', this.obstacleModeEnabled);
+        document.getElementById('obstacleMode').classList.toggle('active', this.obstacleModeEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.obstacleModeEnabled ? '⚠️ Obstacle detection enabled - Scanning for hazards' : 'Obstacle detection disabled');
+        this.updateModeIndicator();
+    }
+    
+    toggleContrastMode() {
+        this.contrastModeEnabled = !this.contrastModeEnabled;
+        document.getElementById('contrastMode').setAttribute('aria-pressed', this.contrastModeEnabled);
+        document.getElementById('contrastMode').classList.toggle('active', this.contrastModeEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.contrastModeEnabled ? '🎨 Contrast analysis enabled - Checking color contrast' : 'Contrast analysis disabled');
+        this.updateModeIndicator();
+    }
+    
+    toggleReadabilityMode() {
+        this.readabilityModeEnabled = !this.readabilityModeEnabled;
+        document.getElementById('readabilityMode').setAttribute('aria-pressed', this.readabilityModeEnabled);
+        document.getElementById('readabilityMode').classList.toggle('active', this.readabilityModeEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.readabilityModeEnabled ? '📖 Text readability enabled - Analyzing text clarity' : 'Text readability disabled');
+        this.updateModeIndicator();
+    }
+    
+    toggleLightingMode() {
+        this.lightingModeEnabled = !this.lightingModeEnabled;
+        document.getElementById('lightingMode').setAttribute('aria-pressed', this.lightingModeEnabled);
+        document.getElementById('lightingMode').classList.toggle('active', this.lightingModeEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.lightingModeEnabled ? '💡 Lighting analysis enabled - Checking brightness levels' : 'Lighting analysis disabled');
+        this.updateModeIndicator();
+    }
+    
+    toggleAudioBeacon() {
+        this.audioBeaconEnabled = !this.audioBeaconEnabled;
+        document.getElementById('audioBeacon').setAttribute('aria-pressed', this.audioBeaconEnabled);
+        document.getElementById('audioBeacon').classList.toggle('active', this.audioBeaconEnabled);
+        this.hapticFeedback('short');
+        this.updateStatus(this.audioBeaconEnabled ? '🔊 Audio beacons enabled - Directional sound cues active' : 'Audio beacons disabled');
+    }
+    
+    toggleVoiceNav() {
+        this.voiceNavEnabled = !this.voiceNavEnabled;
+        document.getElementById('voiceNav').setAttribute('aria-pressed', this.voiceNavEnabled);
+        document.getElementById('voiceNav').classList.toggle('active', this.voiceNavEnabled);
+        
+        if (this.voiceNavEnabled) {
+            this.startVoiceListening();
+            this.updateStatus('🗣️ Voice navigation enabled - Start speaking commands!');
+        } else {
+            this.stopVoiceListening();
+            this.updateStatus('Voice navigation disabled');
+        }
+        
+        this.hapticFeedback('short');
+    }
+    
+    toggleSoundscape() {
+        this.soundscapeEnabled = !this.soundscapeEnabled;
+        document.getElementById('soundscape').setAttribute('aria-pressed', this.soundscapeEnabled);
+        document.getElementById('soundscape').classList.toggle('active', this.soundscapeEnabled);
+        
+        if (this.soundscapeEnabled) {
+            this.startSoundscape();
+            this.updateStatus('🌿 Environmental soundscape enabled');
+        } else {
+            this.stopSoundscape();
+            this.updateStatus('Environmental soundscape disabled');
+        }
+        
+        this.hapticFeedback('short');
+    }
+    
+    // Initialize theme from localStorage
+    initializeTheme() {
+        const savedTheme = localStorage.getItem('voiceEyesDarkMode');
+        if (savedTheme === 'true') {
+            this.darkModeEnabled = true;
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('darkModeToggle').setAttribute('aria-pressed', 'true');
+            document.getElementById('darkModeToggle').classList.add('active');
         }
     }
 }
