@@ -5,29 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoiceEyes Pro - AI Visual Assistant</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Skip Link for Accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#main-content" class="skip-link" tabindex="1">Skip to main content</a>
 
     <!-- Header with Accessibility Controls -->
-    <header class="header">
+    <header class="header" role="banner">
         <div class="header-content">
-            <h1>🎯 VoiceEyes Pro</h1>
-            <p class="subtitle">Advanced AI Visual Assistant for Accessibility</p>
-            
-            <div class="header-controls">
-                <button id="highContrastToggle" class="accessibility-btn" aria-label="Toggle high contrast mode">
-                    🌓 High Contrast
-                </button>
-                <button id="fontSizeToggle" class="accessibility-btn" aria-label="Toggle large font mode">
-                    🔍 Large Font
-                </button>
-                <button id="hapticToggle" class="accessibility-btn" aria-label="Toggle haptic feedback">
-                    📳 Haptic
-                </button>
+            <div class="brand">
+                <h1>VoiceEyes Pro</h1>
+                <p class="subtitle">Advanced AI Visual Assistant for Accessibility</p>
             </div>
+            
+            <nav class="accessibility-nav" role="navigation" aria-label="Accessibility controls">
+                <button id="highContrastToggle" class="accessibility-btn" 
+                        aria-pressed="false" 
+                        aria-describedby="high-contrast-desc"
+                        title="Toggle high contrast mode for better visibility">
+                    <span class="btn-icon" aria-hidden="true">🌓</span>
+                    <span class="btn-text">High Contrast</span>
+                </button>
+                <button id="fontSizeToggle" class="accessibility-btn" 
+                        aria-pressed="false" 
+                        aria-describedby="large-font-desc"
+                        title="Toggle large font mode for better readability">
+                    <span class="btn-icon" aria-hidden="true">🔍</span>
+                    <span class="btn-text">Large Font</span>
+                </button>
+                <button id="hapticToggle" class="accessibility-btn" 
+                        aria-pressed="true" 
+                        aria-describedby="haptic-desc"
+                        title="Toggle haptic feedback for tactile responses">
+                    <span class="btn-icon" aria-hidden="true">📳</span>
+                    <span class="btn-text">Haptic</span>
+                </button>
+            </nav>
         </div>
+        
+        <!-- Hidden descriptions for screen readers -->
+        <div id="high-contrast-desc" class="sr-only">Enables high contrast mode for better visibility</div>
+        <div id="large-font-desc" class="sr-only">Increases font size for better readability</div>
+        <div id="haptic-desc" class="sr-only">Provides vibration feedback for actions</div>
     </header>
 
     <!-- Main Content -->
@@ -296,5 +318,6 @@
 
     <!-- Scripts -->
     <script src="script.js"></script>
+    <script src="script-utils.js"></script>
 </body>
 </html>
